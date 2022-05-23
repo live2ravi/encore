@@ -1,0 +1,22 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources":{
+      "myLaunchTemplate":{
+        "Type":"AWS::EC2::LaunchTemplate",
+        "Properties":{
+          "LaunchTemplateName":{"Fn::Sub":"${AWS::StackName}-launch-template"},
+          "LaunchTemplateData":{
+            "BlockDeviceMappings":[{
+              "Ebs":{
+                "VolumeSize":"22",
+                "VolumeType":"gp2",
+                "DeleteOnTermination": true,
+                "Encrypted": true
+              },
+              "DeviceName":"/dev/xvdcz"   // EBS volume mapped to /dev/xvdcz. The /dev/xvdcz volume uses the General Purpose SSD (gp2) volume type and is deleted when terminating the instance it is attached to
+            }],
+          }
+        }
+      }
+    }
+  }
