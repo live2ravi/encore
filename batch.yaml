@@ -1,0 +1,61 @@
+ComputeEnvironment:
+    Type: AWS::Batch::ComputeEnvironment
+    Properties:
+        ComputeEnvironmentName: !Sub '${AppCI}-${EnvironmentName}'
+        Type: MANAGED
+        State: ENABLED
+        ServiceRole: !Ref: BatchServiceRole
+        ComputeResources:
+          MaxvCpus: 128
+          SecurityGroupIds: 
+            - sg-abcd1234
+          Subnets: 
+            - subnet-789011
+            - subnet-123456
+          MinvCpus: 0
+          #ImageId: 
+          InstanceRole: !Ref: BatchInstanceProfile
+          InstanceTypes: 
+            - t4g.large
+            - t4g.xlarge
+            - t4g.2xlarge
+          Tags: {"ApplicationCI" : ${AppCI} }
+          DesiredvCpus: 48
+      
+    #LaunchTemplate:
+  
+    BatchInstanceIAMRole:
+      Type: 'AWS::IAM::Role'
+      Properties:
+        RoleName: !Sub '${AppCI}-batch-instance-role'
+        AssumeRolePolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - 
+              Effect: 'Allow'
+              Principal:
+                Service:
+                  - 'ec2.amazonaws.com'
+              Action:
+                - 'sts:AssumeRole'
+        PermissionsBoundary: 'arn:aws:iam::849619803245:policy/AppPolicy_DRE'
+        ManagedPolicyArns:
+          - 'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role'
+          - 'arn:aws:iam::aws:policy/additional_policies_as_required'
+    
+    BatchServiceRole:
+      Type: 'AWS::IAM::Role'
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - 
+              Effect: 'Allow'
+              Principal:
+                Service:
+                  - 'batch.amazonaws.com'
+              Action:
+                - 'sts:AssumeRole'
+        PermissionsBoundary: 'arn:aws:iam::849619803245:policy/BoundaryPolicy_DRE'
+        ManagedPolicyArns:
+          - 'arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole'
